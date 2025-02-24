@@ -72,7 +72,8 @@ BATON = {
     "SITE_TITLE": "Admin Panel",
     "INDEX_TITLE": "Boshqaruv paneli",
     "SUPPORT_HREF": "https://example.com/support",
-    "COPYRIGHT": "2025 © Muzaffar",
+    "COPYRIGHT": "2025 © Abdulaziz"
+                 "",
 }
 
 ROOT_URLCONF = 'config.urls'
@@ -102,9 +103,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         # 'NAME': 'db.sqlite3'
-        'NAME': 'ecommerce',
+        'NAME': 'alijahon',
         'USER': 'postgres',
-        'PASSWORD': 'Muzaffar080403',
+        'PASSWORD': 'abdulaziz09',
         'HOST': 'localhost',
         'PORT': 5432
     }

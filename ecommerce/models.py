@@ -50,8 +50,10 @@ class Product(BaseModel):
 
     @property
     def get_absolute_url(self):
-        image = self.product_images.filter(is_primary=True)[0]
-        return image.image.url
+        image = self.product_images.filter(is_primary=True).first()
+        if image:  # Agar asosiy rasm mavjud bo'lsa
+            return image.image.url
+        return None  # Yoki biror default rasm yo'lini qaytarish mumkin
 
     @property
     def discounted_price(self):
