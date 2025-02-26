@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from .models import Product
 
@@ -9,6 +9,8 @@ def after_product_saved(sender, instance, created, **kwargs):
     else:
         print(f"Product updated: {instance}")
 
-@receiver(post_delete, sender=Product)
-def after_product_deleted(sender, instance, **kwargs):
-    print(f"Product deleted: {instance}")
+@receiver(pre_delete, sender=Product)
+def save_products_before_delete(sender, instance, **kwargs):
+    with open("deleted_products.txt.txt", "a") as file:
+        file.write(f"O‘chirilgan product: {instance.name}, {instance.description}\n")
+    print(f"{instance.name} ma’lumotlari saqlandi va o‘chiriladi.")

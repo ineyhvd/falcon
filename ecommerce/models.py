@@ -32,12 +32,6 @@ class Category(BaseModel):
 
 
 class Product(BaseModel):
-    # class RatingChoice(models.IntegerChoices):
-    #     ONE = 1
-    #     TWO = 2
-    #     THREE = 3
-    #     FOUR = 4
-    #     FIVE = 5
 
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -51,9 +45,9 @@ class Product(BaseModel):
     @property
     def get_absolute_url(self):
         image = self.product_images.filter(is_primary=True).first()
-        if image:  # Agar asosiy rasm mavjud bo'lsa
+        if image:
             return image.image.url
-        return None  # Yoki biror default rasm yo'lini qaytarish mumkin
+        return None
 
     @property
     def discounted_price(self):
@@ -215,5 +209,3 @@ class ShoppingCart(BaseModel):
 
     def __str__(self):
         return f'{self.user} -> {self.product}'
-
-
