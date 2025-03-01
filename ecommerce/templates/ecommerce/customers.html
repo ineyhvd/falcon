@@ -23,7 +23,6 @@
                         </div>
                     </div>
                     <div id="table-customers-replace-element">
-                        <!-- Bu tugma 'add_customer' sahifasiga yo'naltiradi -->
                         <a href="{% url 'ecommerce:add_customer' %}" class="btn btn-falcon-default btn-sm">
                             <span class="fas fa-plus" data-fa-transform="shrink-3 down-2"></span>
                             <span class="d-none d-sm-inline-block ms-1">New</span>
@@ -33,6 +32,20 @@
                             <span class="fas fa-filter" data-fa-transform="shrink-3 down-2"></span>
                             <span class="d-none d-sm-inline-block ms-1">Filter</span>
                         </button>
+                        <form action="{% url 'ecommerce:export_data' %}">
+
+                            <select class="form-select" aria-label="Default select example" name="format">
+                                <option value="none" selected>...</option>
+                                <option value="json">Json</option>
+                                <option value="xlsx">XLSX</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                            <button class="btn btn-falcon-default btn-sm" type="submit"><span
+                                    class="fas fa-external-link-alt"
+                                    data-fa-transform="shrink-3 down-2"></span><span
+                                    class="d-none d-sm-inline-block ms-1">Export</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

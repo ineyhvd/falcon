@@ -1,13 +1,16 @@
+import csv
+import json
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from ecommerce.utils import generate_invoice_prefix
 from ecommerce.models import Product, Customer, ShoppingCart, Comment
 from ecommerce.forms import CustomerModelForm
+from django.db.models import Max , Min , Count
 
 
 def index(request):
@@ -178,3 +181,71 @@ def remove_from_cart(request, product_id):
 
 def order_list(request):
     return render(request, 'ecommerce/order-list.html')
+
+
+def export_data(request):
+    format = request.GET.get('format', '')
+    response = None
+    if format == 'csv':
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=customer_list.csv'
+        writer = csv.writer(response)
+        writer.writerow(['Id', 'Full Name', 'Email', 'Phone Number', 'Address'])
+        for customer in Customer.objects.all():
+            writer.writerow([customer.id, customer.full_name, customer.email, customer.phone_number, customer.address])
+    elif format == 'json':
+        response = HttpResponse(content_type='application/json')
+        data = list(Customer.objects.all().values('full_name', 'email', 'address', 'phone_number'))
+        for customer in data:
+            customer['phone_number'] = str(customer['phone_number'])
+        response.write(json.dumps(data, indent=3))
+        response['Content-Disposition'] = 'attachment; filename=customers.json'
+    elif format == 'xlsx':
+        response = HttpResponse(content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=customers.xlsx'
+        writer = xlsx.writer(response)
+        writer.writerow(['Id', 'Full Name', 'Email', 'Phone Number', 'Address'])
+        for customer in Customer.objects.all():
+            writer.writerow([customer.id, customer.full_name, customer.email, customer.phone_number, customer.address])
+
+
+    else:
+        response = HttpResponse(status=404)
+        response.content = 'Bad request'
+
+    return response
+
+
+# (.venv) PS C:\Users\user\Desktop\ecommerce> py manage.py shell
+# Python 3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)] on win32
+# Type "help", "copyright", "credits" or "license" for more information.
+# (InteractiveConsole)
+# >>> from django.db.models import Max , Min , Count
+# >>> from ecommerce.models import Order
+# >>> Order.object.all().aggregate(Count('id'))
+# Traceback (most recent call last):
+#   File "<console>", line 1, in <module>
+# AttributeError: type object 'Order' has no attribute 'object'. Did you mean: 'objects'?
+# >>> Order.objects.all().aggregate(Count('id'))
+# {'id__count': 0}
+
+
+
+
+
+# (.venv) PS C:\Users\user\Desktop\ecommerce> py manage.py shell
+# Python 3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)] on win32
+# Type "help", "copyright", "credits" or "license" for more information.
+# (InteractiveConsole)
+# >>> from django.db.models import Max,Min,Count
+# >>> from ecommerce.models import Order
+# >>> Order.objects.all().annotade(avg_order_id=Avg('id'))
+# Traceback (most recent call last):
+#   File "<console>", line 1, in <module>
+# AttributeError: 'QuerySet' object has no attribute 'annotade'. Did you mean: 'annotate'?
+# >>> Order.objects.all().annotate(avg_order_id=Avg('id'))
+# Traceback (most recent call last):
+#   File "<console>", line 1, in <module>
+# NameError: name 'Avg' is not defined
+# >>> Order.objects.all().annotate(avg_order_id=Min('id'))
+# <QuerySet []>
