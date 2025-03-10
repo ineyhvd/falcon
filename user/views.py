@@ -65,9 +65,6 @@ def register(request):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             })
-            # verification_code = get_random_string(6, '0123456789')  # 6 xonali kod
-            # request.session['verification_code'] = verification_code  # Sessiyada saqlash
-            # request.session['email'] = user.email
             email_message = EmailMessage(subject, message, to=[email])
             email_message.content_subtype = 'html'
             email_message.send()

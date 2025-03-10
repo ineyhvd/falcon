@@ -7,10 +7,18 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
+
+from ecommerce.serializers import ProductSerializer
 from ecommerce.utils import generate_invoice_prefix
 from ecommerce.models import Product, Customer, ShoppingCart, Comment
 from ecommerce.forms import CustomerModelForm
 from django.db.models import Max , Min , Count
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated , AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from ecommerce.serializers import ProductSerializer
+
 
 
 def index(request):
@@ -249,3 +257,12 @@ def export_data(request):
 # NameError: name 'Avg' is not defined
 # >>> Order.objects.all().annotate(avg_order_id=Min('id'))
 # <QuerySet []>
+
+class ProductList(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, format=None):
+        posts=Product.objects.all()
+        serializer = ProductSerializer(posts, many=True)
+
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
