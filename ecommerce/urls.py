@@ -19,5 +19,8 @@ urlpatterns = [
     path('remove-to-cart/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('order/', views.order_list, name='order_list'),
     path('export/', views.export_data, name='export_data'),
-    path('product-list/' , views.ProductList.as_view() , name='product_list'),
+    path('category-list/',views.CategoryListCreateView.as_view(), name='category-list'),
+    path('category-detail/<int:pk>/' , views.CategoryDetailView.as_view(), name='category-detail'),
+    path('product-list/',views.ProductListCreateView.as_view(), name='product-list'),
+    path('product-detail/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
 ]

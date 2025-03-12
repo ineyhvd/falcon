@@ -8,15 +8,16 @@ from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 
-from ecommerce.serializers import ProductSerializer
+from ecommerce.serializers import ProductSerializer, CategorySerializer
 from ecommerce.utils import generate_invoice_prefix
-from ecommerce.models import Product, Customer, ShoppingCart, Comment
+from ecommerce.models import Product, Customer, ShoppingCart, Comment , Category
 from ecommerce.forms import CustomerModelForm
 from django.db.models import Max , Min , Count
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated , AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
 from ecommerce.serializers import ProductSerializer
 
 
@@ -258,11 +259,157 @@ def export_data(request):
 # >>> Order.objects.all().annotate(avg_order_id=Min('id'))
 # <QuerySet []>
 
-class ProductList(APIView):
-    permission_classes = [AllowAny]
-    def get(self, request, format=None):
-        posts=Product.objects.all()
-        serializer = ProductSerializer(posts, many=True)
+# class PostListOrCreate(APIView):
+#     permission_classes = [AllowAny]
+#
+#     def get(self, request, format=None):
+#         posts = Product.objects.all()
+#         serializers = ProductSerializer(posts, many=True)
+#
+#         return Response(serializers.data, status=status.HTTP_200_OK)
+#
+#     def post(self, request):
+#         serializer = ProductSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# class PostDetail(APIView):
+#     def get(self, request, pk, format=None):
+#         try:
+#             post = Product.objects.get(id=pk)
+#             serializer = ProductSerializer(post)
+#             return Response(serializer.data)
+#         except Product.DoesNotExist:
+#             return Response({'error': 'Post does not exist'}, status=status.HTTP_404_NOT_FOUND)
+#
+#     def delete(self, request, pk=None):
+#         try:
+#             post = Product.objects.get(id=pk)
+#             if post:
+#                 post.delete()
+#                 data = {'message': 'Post successfully deleted'}
+#                 return Response(data, status=status.HTTP_204_NO_CONTENT)
+#         except Product.DoesNotExist:
+#             data = {'message': 'Post Not Found'}
+#             return Response(data, status=status.HTTP_404_NOT_FOUND)
+#
+#     def put(self, request, pk=None):
+#         post = Product.objects.get(pk=pk)
+#         serializer = ProductSerializer(post, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#     def patch(self, request):
+#         post = Product.objects.get(pk=pk)
+#         serializer = ProductSerializer(post, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CategoryListCreateView(generics.GenericAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def get(self, request, *args, **kwargs):
+        category = self.get_queryset()
+        serializer = self.get_serializer(category, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class CategoryDetailView(generics.GenericAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            category = self.get_object()
+            serializer = self.get_serializer(category)
+            return Response(serializer.data)
+        except Category.DoesNotExist:
+            return Response({"error": "Category topilmadi"}, status=404)
+
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            category = self.get_object()
+            serializer = self.get_serializer(category, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+        except Category.DoesNotExist:
+            return Response({"error": "Category topilmadi"}, status=404)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            category = self.get_object()
+            category.delete()
+            return Response(status=204)
+        except Category.DoesNotExist:
+            return Response({"error": "Category topilmadi"}, status=404)
+
+
+
+
+class ProductListCreateView(generics.GenericAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class ProductDetailView(generics.GenericAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get(self, request, pk, *args, **kwargs):
+        try:
+         product = self.get_queryset()
+         serializer = self.get_serializer(product, many=True)
+         return Response(serializer.data)
+        except Product.DoesNotExist:
+            return Response({"error": "Product topilmadi"}, status=404)
+
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            product = self.get_object()
+            serializer = self.get_serializer(product, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+        except Product.DoesNotExist:
+            return Response({"error": "Product topilmadi"}, status=404)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            product = self.get_object()
+            product.delete()
+            return Response(status=204)
+        except Product.DoesNotExist:
+            return Response({"error": "Product topilmadi"}, status=404)
+
