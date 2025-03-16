@@ -23,4 +23,6 @@ urlpatterns = [
     path('category-detail/<int:pk>/' , views.CategoryDetailView.as_view(), name='category-detail'),
     path('product-list/',views.ProductListCreateView.as_view(), name='product-list'),
     path('product-detail/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
+    path('image/',views.ImageView.as_view(), name='image'),
+    path('image/<int:image_id>/', views.ImageView.as_view(), name='retrieve-image'),
 ]

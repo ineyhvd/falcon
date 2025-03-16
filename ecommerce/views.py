@@ -8,9 +8,9 @@ from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 
-from ecommerce.serializers import ProductSerializer, CategorySerializer
+from ecommerce.serializers import ProductSerializer, CategorySerializer, ImageSerializer
 from ecommerce.utils import generate_invoice_prefix
-from ecommerce.models import Product, Customer, ShoppingCart, Comment , Category
+from ecommerce.models import Product, Customer, ShoppingCart, Comment , Category , Image
 from ecommerce.forms import CustomerModelForm
 from django.db.models import Max , Min , Count
 from rest_framework.views import APIView
@@ -412,4 +412,21 @@ class ProductDetailView(generics.GenericAPIView):
             return Response(status=204)
         except Product.DoesNotExist:
             return Response({"error": "Product topilmadi"}, status=404)
+
+class ImageView(generics.GenericAPIView):
+    serializer_class = ImageSerializer
+
+    def get(self, request, image_id = None,*args, **kwargs):
+        if image_id is not None:
+            try:
+                image=Image.objects.get(pk=image_id)
+                serializer = self.get_serializer(image, context={'request': request})
+                return Response(serializer.data)
+            except Image.DoesNotExist:
+                return Response({"error": "Image topilmadi"}, status=404)
+        else:
+            images = Image.objects.all()
+            serializer = self.get_serializer(images, context={'request': request})
+            return Response(serializer.data)
+
 
